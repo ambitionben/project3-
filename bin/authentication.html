@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project 3 Enterprise System</title>
+    <style>
+        body {
+            background-color: black;
+            color: lime;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .form-container {
+            display: inline-block;
+            text-align: left;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        input[type=text], input[type=password] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type=submit] {
+            width: 100%;
+            background-color: green;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type=submit]:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Summer 2024 Project 3 Enterprise System</h1>
+        <h2>A Servlet/JSP-Based Multi-Tiered Enterprise Application Using A Tomcat Container</h2>
+        <h3>- User Authentication Page -</h3>
+        <div class="form-container">
+            <form action="login" method="post">
+                <label for="username">UserName:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <input type="submit" value="Click To Authenticate">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
