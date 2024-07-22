@@ -1,4 +1,3 @@
-
 import com.mysql.cj.jdbc.MysqlDataSource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -30,15 +29,21 @@ public class LoginServlet extends HttpServlet {
         boolean isValid = false;
 
         try {
+            System.out.println("Loading properties file...");
             filein = new FileInputStream(
                     getServletContext().getRealPath("/WEB-INF/lib/properties/systemapp.properties"));
             properties.load(filein);
+
+            System.out.println("Creating data source...");
             dataSource = new MysqlDataSource();
             dataSource.setURL(properties.getProperty("MYSQL_DB_URL"));
             dataSource.setUser(properties.getProperty("MYSQL_DB_USERNAME"));
             dataSource.setPassword(properties.getProperty("MYSQL_DB_PASSWORD"));
+
+            System.out.println("Connecting to database...");
             connection = dataSource.getConnection();
 
+            System.out.println("Executing query...");
             String sql = "SELECT * FROM usercredentials WHERE login_username = ? AND login_password = ?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, username);
@@ -67,9 +72,11 @@ public class LoginServlet extends HttpServlet {
         }
 
         if (isValid) {
+            System.out.println("Authentication successful!");
             response.getWriter().println("Authentication Successful!");
         } else {
-            response.sendRedirect("errorpage.html");
+            System.out.println("Redirecting to errorpage.html");
+            response.sendRedirect("/Project3/errorpage.html");
         }
     }
 }
