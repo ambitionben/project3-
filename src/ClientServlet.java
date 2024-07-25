@@ -7,18 +7,19 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
-@WebServlet("/login")
-public class LoginServlet extends HttpServlet {
+@WebServlet("/ExecuteSQLServletClient")
+public class ClientServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        String sqlCommand = request.getParameter("sqlCommand");
+        System.out.println("Received SQL Command: " + sqlCommand);
 
         Properties properties = new Properties();
         FileInputStream filein = null;
@@ -26,12 +27,13 @@ public class LoginServlet extends HttpServlet {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        boolean isValid = false;
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
 
         try {
             System.out.println("Loading properties file...");
-            filein = new FileInputStream(
-                    getServletContext().getRealPath("/WEB-INF/lib/properties/systemapp.properties"));
+            filein = new FileInputStream(getServletContext().getRealPath("/WEB-INF/lib/properties/client.properties"));
             properties.load(filein);
 
             System.out.println("Creating data source...");
@@ -44,17 +46,32 @@ public class LoginServlet extends HttpServlet {
             connection = dataSource.getConnection();
 
             System.out.println("Executing query...");
-            String sql = "SELECT * FROM usercredentials WHERE login_username = ? AND login_password = ?";
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, username);
-            statement.setString(2, password);
-            resultSet = statement.executeQuery();
+            statement = connection.prepareStatement(sqlCommand);
 
-            if (resultSet.next()) {
-                isValid = true;
+            if (sqlCommand.trim().toLowerCase().startsWith("select")) {
+                resultSet = statement.executeQuery();
+                out.println("<table border='1'>");
+                int columnCount = resultSet.getMetaData().getColumnCount();
+                out.println("<tr>");
+                for (int i = 1; i <= columnCount; i++) {
+                    out.println("<th>" + resultSet.getMetaData().getColumnName(i) + "</th>");
+                }
+                out.println("</tr>");
+                while (resultSet.next()) {
+                    out.println("<tr>");
+                    for (int i = 1; i <= columnCount; i++) {
+                        out.println("<td>" + resultSet.getString(i) + "</td>");
+                    }
+                    out.println("</tr>");
+                }
+                out.println("</table>");
+            } else {
+                out.println("<p>Command not permitted.</p>");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error executing SQL command: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.println("ERROR:" + e.getMessage() + "\nCOMMAND:" + sqlCommand);
         } finally {
             try {
                 if (resultSet != null)
@@ -66,27 +83,8 @@ public class LoginServlet extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            if (filein != null) {
+            if (filein != null)
                 filein.close();
-            }
-        }
-
-        if (isValid) {
-            System.out.println("Authentication successful!");
-            if (username.equals("root")) {
-                response.sendRedirect("root.jsp");
-            } else if (username.equals("client")) {
-                response.sendRedirect("client.jsp");
-            } else if (username.equals("dataentryuser")) {
-                response.sendRedirect("dataentryuser.jsp");
-            } else if (username.equals("theaccountant")) {
-                response.sendRedirect("accountant.jsp");
-            } else {
-                response.getWriter().println("Authentication Successful!");
-            }
-        } else {
-            System.out.println("Redirecting to errorpage.html");
-            response.sendRedirect("/Project3/errorpage.html");
         }
     }
 }
