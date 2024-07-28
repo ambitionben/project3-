@@ -64,6 +64,25 @@
             document.getElementById(formId).reset();
             document.getElementById("results").innerHTML = "";
         }
+
+        function submitForm(formId, table) {
+            const form = document.getElementById(formId);
+            const formData = new FormData(form);
+            formData.append('table', table); // Add the table parameter
+            const params = new URLSearchParams(formData);
+
+            fetch(`dataentryuser`, {
+                method: 'POST',
+                body: params
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("results").innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
 </head>
 <body>
@@ -174,25 +193,5 @@
             <!-- Results will be displayed here -->
         </div>
     </div>
-
-    <script>
-        function submitForm(formId, table) {
-            const form = document.getElementById(formId);
-            const formData = new FormData(form);
-            const params = new URLSearchParams(formData);
-
-            fetch(`dataentryuser?table=${table}`, {
-                method: 'POST',
-                body: params
-            })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById("results").innerHTML = data;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-    </script>
 </body>
 </html>
