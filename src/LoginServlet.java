@@ -1,3 +1,10 @@
+
+/* Name:BenjaminBelizaire
+Course: CNT 4714 – Summer 2024 – Project Three
+Assignment title: A Three-Tier Distributed Web-Based Application
+Servlet: LoginServlet.java
+Date: August 1, 2024
+*/
 import com.mysql.cj.jdbc.MysqlDataSource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

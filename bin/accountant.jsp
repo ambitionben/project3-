@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Accountant User - Project 3 Enterprise System</title>
+    <title>Accountant Reports - Project 3 Enterprise System</title>
     <style>
         body {
-            background-color: black;
-            color: lime;
+            background-color: #222;
+            color: #ccc;
             text-align: center;
             font-family: Arial, sans-serif;
         }
@@ -16,17 +16,19 @@
         .form-container {
             display: inline-block;
             text-align: left;
-            background-color: #222;
+            background-color: #333;
             padding: 20px;
             border-radius: 10px;
-            margin-bottom: 30px;
         }
-        input[type=radio] {
-            margin: 10px;
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         input[type=button] {
             width: 100%;
-            min-width: 280px;
             background-color: green;
             color: white;
             padding: 10px;
@@ -45,20 +47,32 @@
             border-radius: 10px;
             margin-top: 20px;
         }
+        .error-box {
+            color: red;
+            border: 2px solid red;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background-color: #ffcccc;
+        }
     </style>
     <script>
         function executeReport() {
-            const selectedReport = document.querySelector('input[name="report"]:checked').value;
-            fetch(`accountant?report=${selectedReport}`, {
-                method: 'GET',
-            })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById("results").innerHTML = data;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            const cmd = document.getElementById("cmd").value;
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", "accountant?cmd=" + cmd, true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        document.getElementById("results").innerHTML = xhr.responseText;
+                    } else {
+                        document.getElementById("results").innerHTML = "<div class='error-box'>Error: " + xhr.statusText + "</div>";
+                    }
+                }
+            };
+
+            xhr.send();
         }
 
         function clearResults() {
@@ -68,21 +82,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to the Summer 2024 Project 3 Enterprise System</h1>
-        <h2>Accountant Application</h2>
+        <h1>Accountant Reports</h1>
+        <h2>Project 3 Enterprise System</h2>
         <div class="form-container">
-            <h3>Select a report to generate:</h3>
-            <input type="radio" id="report1" name="report" value="Get_Maximum_Status" checked>
-            <label for="report1">Get the Maximum Status Value of All Suppliers</label><br>
-            <input type="radio" id="report2" name="report" value="Get_Total_Weight_Parts">
-            <label for="report2">Get the Total Weight of All Parts</label><br>
-            <input type="radio" id="report3" name="report" value="Get_Total_Number_Shipments">
-            <label for="report3">Get the Total Number of Shipments</label><br>
-            <input type="radio" id="report4" name="report" value="Get_Name_NumWorkers_MostWorkers_Job">
-            <label for="report4">Get the Name and Number of Workers of the Job with the Most Workers</label><br>
-            <input type="radio" id="report5" name="report" value="List_Name_Status_Suppliers">
-            <label for="report5">List the Name and Status of Every Supplier</label><br>
-            <input type="button" value="Execute Command" onclick="executeReport()">
+            <label for="cmd">Select Report:</label>
+            <select id="cmd" name="cmd">
+                <option value="1">Sum of All Part Weights</option>
+                <option value="2">Maximum Status of All Suppliers</option>
+                <option value="3">Total Number of Shipments</option>
+                <option value="4">Job with the Most Workers</option>
+                <option value="5">Name and Status of All Suppliers</option>
+            </select>
+            <input type="button" value="Execute Report" onclick="executeReport()">
             <input type="button" value="Clear Results" onclick="clearResults()">
         </div>
         <div id="results" class="results-container">
